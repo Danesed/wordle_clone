@@ -1,5 +1,7 @@
 const tileDisplay = document.querySelector('.tile-container')
 const keyboard = document.querySelector('.key-container')
+const messageDisplay = document.querySelector('.message-container')
+
 
 const wordle = 'super';
 const keys = [
@@ -17,6 +19,7 @@ const guessRows = [
 
 let currentRow = 0;
 let currentTile = 0;
+let isGameOver = false;
 
 guessRows.forEach((guessRow,guessRowIndex) => {
     const rowElement = document.createElement('div');
@@ -42,10 +45,11 @@ keys.forEach(key => {
 const handleClick = (key) => {
     console.log('clicked', key);
     if (key === '<<') {
-        console.log('delete letter')
+        deleteLetter();
         return
     }
     if (key === 'ENTER') {
+        checkRow();
         console.log('check row')
         return
     }
@@ -60,4 +64,44 @@ const addLetter = (letter) => {
      tile.setAttribute('data', letter)
      currentTile++;
     }
+}
+
+const deleteLetter = () => {
+    if (currentTile > 0) {
+    currentTile--;
+    const tile = document.getElementById('guessRow-' + currentRow + '-tile-' + currentTile);
+    tile.textContent = '';
+    guessRows[currentRow][currentTile] = '';
+     tile.setAttribute('data', '')
+    }
+} 
+
+const checkRow = () => {
+    const guess = guessRows[currentRow].join('');
+
+    if (currentTile > 4) {
+        if (wordle == guess){
+            showMessage('correct');
+            isGameOver = true;
+            return
+        }
+        else {
+            if(currentRow >= 5) {
+                isGameOver = true;
+                showMessage('Game Over');
+                return
+            }
+            if (currentRow < 5) {
+                currentRow++;
+                currentTile = 0;
+            }
+        }
+    }
+}
+const showMessage = (message) => {
+    const messageElement = document.createElement('p')
+    messageElement.textContent = message;
+    messageDisplay.append(messageElement)
+    setTimeout(() => messageDisplay.removeChild(messageElement), 2000)
+
 }
