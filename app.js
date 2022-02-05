@@ -2,8 +2,11 @@ const tileDisplay = document.querySelector('.tile-container')
 const keyboard = document.querySelector('.key-container')
 const messageDisplay = document.querySelector('.message-container')
 
+// const wordle = 'SUPER';
+//var wordsArray = ['EARTH','BASED','CLOGS'];
+// var wordle = _.shuffle(wordsArray)[0];
+var wordle = wordsArray[Math.floor(Math.random() * wordsArray.length)];
 
-const wordle = 'SUPER';
 const keys = [
     'Q','W','E','R','T','Y','U','I','O','P','A','S','D','F','G','H','J','K','L','ENTER','Z','X','C','V','B','N','M','<<'
 ]
