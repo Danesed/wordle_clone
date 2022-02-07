@@ -2,11 +2,24 @@ const tileDisplay = document.querySelector('.tile-container')
 const keyboard = document.querySelector('.key-container')
 const messageDisplay = document.querySelector('.message-container')
 
+// testing
 // const wordle = 'SUPER';
 //var wordsArray = ['EARTH','BASED','CLOGS'];
 // var wordle = _.shuffle(wordsArray)[0];
-var wordle = wordsArray[Math.floor(Math.random() * wordsArray.length)];
+//var wordle = wordsArray[Math.floor(Math.random() * wordsArray.length)];
 
+let wordle;
+const getWordle = () => {
+    fetch('http://localhost:8000/word')
+        .then(response => response.json())
+        .then(json => {
+            console.log(json);
+            wordle = json.toUpperCase();
+        })
+        .catch(err => console.log(err))
+}
+
+getWordle();
 const keys = [
     'Q','W','E','R','T','Y','U','I','O','P','A','S','D','F','G','H','J','K','L','ENTER','Z','X','C','V','B','N','M','<<'
 ]
@@ -46,17 +59,19 @@ keys.forEach(key => {
 });
 
 const handleClick = (key) => {
-    console.log('clicked', key);
-    if (key === '<<') {
-        deleteLetter();
-        return
+    if (!isGameOver) {
+        console.log('clicked', key);
+        if (key === '<<') {
+            deleteLetter();
+            return
+        }
+        if (key === 'ENTER') {
+            checkRow();
+            console.log('check row')
+            return
+        }
+        addLetter(key)
     }
-    if (key === 'ENTER') {
-        checkRow();
-        console.log('check row')
-        return
-    }
-    addLetter(key)
 }
 
 const addLetter = (letter) => {
@@ -83,23 +98,35 @@ const checkRow = () => {
     const guess = guessRows[currentRow].join('');
 
     if (currentTile > 4) {
-        flipTile();
-        if (wordle == guess){
-            showMessage('correct');
-            isGameOver = true;
-            return
-        }
-        else {
-            if(currentRow >= 5) {
-                isGameOver = true;
-                showMessage('Game Over');
-                return
-            }
-            if (currentRow < 5) {
-                currentRow++;
-                currentTile = 0;
-            }
-        }
+        fetch(`http://localhost:8000/check/?word=${guess}`)
+            .then(response => response.json())
+            .then(json => {
+                console.log(json)
+                if (json == "Entry word not found") {
+                    showMessage("Word does not exist")
+                    return
+                }
+                else {
+                    flipTile();
+                    if (wordle == guess){
+                        showMessage('correct');
+                        isGameOver = true;
+                        return
+                    }
+                    else {
+                        if(currentRow >= 5) {
+                            isGameOver = true;
+                            showMessage('Game Over');
+                            return
+                        }
+                        if (currentRow < 5) {
+                            currentRow++;
+                            currentTile = 0;
+                        }
+                    }
+                }
+            }).catch(err => console.log(err))
+
     }
 }
 const showMessage = (message) => {
